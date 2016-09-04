@@ -1,7 +1,6 @@
 package com.vm.shadowsocks.ui;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -11,6 +10,8 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -33,14 +34,14 @@ import com.vm.shadowsocks.core.ProxyConfig;
 
 import java.util.Calendar;
 
-public class MainActivity extends Activity implements
+public class MainActivity extends AppCompatActivity implements
         View.OnClickListener,
         OnCheckedChangeListener,
         LocalVpnService.onStatusChangedListener {
 
     private static String GL_HISTORY_LOGS;
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = "MainActivity";
 
     private static final String CONFIG_URL_KEY = "CONFIG_URL_KEY";
 
@@ -56,6 +57,9 @@ public class MainActivity extends Activity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+
 
         scrollViewLog = (ScrollView) findViewById(R.id.scrollViewLog);
         textViewLog = (TextView) findViewById(R.id.textViewLog);
@@ -85,7 +89,7 @@ public class MainActivity extends Activity implements
         SharedPreferences preferences = getSharedPreferences("shadowsocksProxyUrl", MODE_PRIVATE);
         Editor editor = preferences.edit();
         editor.putString(CONFIG_URL_KEY, ProxyUrl);
-        editor.commit();
+        editor.apply();
     }
 
     String getVersionName() {
@@ -282,14 +286,16 @@ public class MainActivity extends Activity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d(TAG, "onCreateOptionsMenu: ");
         getMenuInflater().inflate(R.menu.main_activity_actions, menu);
 
         MenuItem menuItem = menu.findItem(R.id.menu_item_switch);
         if (menuItem == null) {
             return false;
         }
-
-        switchProxy = (Switch) menuItem.getActionView();
+        switchProxy = new Switch(this);
+        menuItem.setActionView(switchProxy);
+        Log.d(TAG, "onCreateOptionsMenu: " + switchProxy);
         if (switchProxy == null) {
             return false;
         }
